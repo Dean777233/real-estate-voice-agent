@@ -10,12 +10,17 @@ export function cors(req: Request): Response | Record<string, string> {
   return headers;
 }
 
+type VariableValues = Record<string, unknown>;
+
 export type VapiBody = {
   message?: {
     call?: {
       id?: string;
       metadata?: Record<string, unknown>;
+      assistantOverrides?: { variableValues?: VariableValues };
+      artifact?: { variableValues?: VariableValues };
     };
+    artifact?: { variableValues?: VariableValues };
     toolCallList?: Array<{
       id?: string;
       arguments?: Record<string, unknown>;
@@ -23,18 +28,75 @@ export type VapiBody = {
   };
 };
 
+function asListingId(value: unknown): string | undefined {
+  if (typeof value === "string" && value.trim()) return value.trim();
+  return undefined;
+}
+
+function listingIdFromVariableValues(
+  values: VariableValues | undefined,
+): string | undefined {
+  return asListingId(values?.listing_id);
+}
+
+/** Resolve listing_id from call metadata, variableValues, artifact, or tool args. */
+export function resolveListingId(body: VapiBody): string | undefined {
+  const message = body?.message;
+  const call = message?.call ?? {};
+  const args = message?.toolCallList?.[0]?.arguments ?? {};
+
+  const fromMetadata = asListingId(call.metadata?.listing_id);
+  if (fromMetadata) return fromMetadata;
+
+  const fromAssistantOverrides = listingIdFromVariableValues(
+    call.assistantOverrides?.variableValues,
+  );
+  if (fromAssistantOverrides) return fromAssistantOverrides;
+
+  const fromMessageArtifact = listingIdFromVariableValues(
+    message?.artifact?.variableValues,
+  );
+  if (fromMessageArtifact) return fromMessageArtifact;
+
+  const fromCallArtifact = listingIdFromVariableValues(
+    call.artifact?.variableValues,
+  );
+  if (fromCallArtifact) return fromCallArtifact;
+
+  return asListingId(args.listing_id);
+}
+
 export function parseVapiBody(body: VapiBody) {
   const call = body?.message?.call ?? {};
   const toolCall = body?.message?.toolCallList?.[0];
   const meta = call?.metadata ?? {};
   const args = toolCall?.arguments ?? {};
+  const listingId = resolveListingId(body);
+
+  if (!listingId) {
+    console.warn("[vapi] listing_id missing", {
+      callId: call?.id,
+      hasMetadata: meta.listing_id != null,
+      hasAssistantOverrides: call.assistantOverrides?.variableValues?.listing_id != null,
+      hasArtifact: messageArtifactPresent(body),
+      hasArgs: args.listing_id != null,
+    });
+  }
+
   return {
     toolCallId: toolCall?.id ?? "unknown",
     args,
-    listingId: (meta.listing_id ?? args.listing_id) as string | undefined,
-    investorId: meta.investor_id as string | undefined,
+    listingId,
+    investorId: asListingId(meta.investor_id),
     callId: call?.id,
   };
+}
+
+function messageArtifactPresent(body: VapiBody): boolean {
+  return (
+    body?.message?.artifact?.variableValues?.listing_id != null ||
+    body?.message?.call?.artifact?.variableValues?.listing_id != null
+  );
 }
 
 export async function parseVapiTool(req: Request) {

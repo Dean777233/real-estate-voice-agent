@@ -5,6 +5,15 @@ type VapiClient = InstanceType<
   typeof VapiImport extends new (...args: infer A) => infer R ? new (...args: A) => R : never
 >
 
+type WebCallPayload = {
+  id?: string
+  webCallUrl?: string
+  url?: string
+  artifactPlan?: { videoRecordingEnabled?: boolean }
+  assistant?: { voice?: { provider?: string } }
+  transport?: { callUrl?: string }
+}
+
 function resolveVapiConstructor(): new (publicKey: string) => VapiClient {
   const mod = VapiImport as unknown as { default?: new (publicKey: string) => VapiClient }
   const VapiCtor = mod.default ?? (VapiImport as unknown as new (publicKey: string) => VapiClient)
@@ -48,32 +57,28 @@ function formatPrice(price: number): string {
   }).format(price)
 }
 
-function buildOverrides(listing: Listing) {
+/** Listing context passed to Vapi as call metadata + assistant template variables. */
+export function buildDealScoutCallContext(listing: Listing) {
   const listingAddress = `${listing.address}, ${listing.city} ${listing.state}`
+  const listPrice = formatPrice(listing.list_price)
   return {
     metadata: { listing_id: listing.id },
-    variableValues: {
-      listing_id: listing.id,
-      listing_address: listingAddress,
-      list_price: formatPrice(listing.list_price),
+    assistantOverrides: {
+      variableValues: {
+        listing_id: listing.id,
+        listing_address: listingAddress,
+        list_price: listPrice,
+      },
+      firstMessage: `Hi, this is DealScout. I'm ready to walk through ${listingAddress} at ${listPrice}. Let me pull up the listing details now.`,
     },
   }
 }
 
-export async function startDealScoutCall(listing: Listing): Promise<void> {
+async function createWebCall(listing: Listing): Promise<WebCallPayload> {
+  if (!publicKey) throw new Error('VITE_VAPI_PUBLIC_KEY is not configured')
   if (!assistantId) throw new Error('VITE_VAPI_ASSISTANT_ID is not configured')
 
-  const overrides = buildOverrides(listing)
-
-  try {
-    const vapi = getVapi()
-    await vapi.start(assistantId, overrides)
-    return
-  } catch (sdkError) {
-    console.warn('@vapi-ai/web start failed, falling back to REST:', sdkError)
-  }
-
-  if (!publicKey) throw new Error('VITE_VAPI_PUBLIC_KEY is not configured')
+  const { metadata, assistantOverrides } = buildDealScoutCallContext(listing)
 
   const response = await fetch('https://api.vapi.ai/call/web', {
     method: 'POST',
@@ -83,14 +88,12 @@ export async function startDealScoutCall(listing: Listing): Promise<void> {
     },
     body: JSON.stringify({
       assistantId,
-      metadata: overrides.metadata,
-      assistantOverrides: {
-        variableValues: overrides.variableValues,
-      },
+      metadata,
+      assistantOverrides,
     }),
   })
 
-  const body = await response.json().catch(() => ({}))
+  const body = (await response.json().catch(() => ({}))) as WebCallPayload & { message?: string }
   if (!response.ok) {
     const message =
       typeof body?.message === 'string'
@@ -99,9 +102,31 @@ export async function startDealScoutCall(listing: Listing): Promise<void> {
     throw new Error(message)
   }
 
-  const webCallUrl = body.webCallUrl ?? body.url
+  return body
+}
+
+function resolveWebCallUrl(body: WebCallPayload): string | undefined {
+  return body.webCallUrl ?? body.url ?? body.transport?.callUrl
+}
+
+export async function startDealScoutCall(listing: Listing): Promise<void> {
+  const body = await createWebCall(listing)
+  const webCallUrl = resolveWebCallUrl(body)
   if (!webCallUrl) throw new Error('No webCallUrl returned from Vapi')
-  window.open(webCallUrl, '_blank', 'noopener,noreferrer')
+
+  try {
+    const vapi = getVapi()
+    await vapi.reconnect({
+      webCallUrl,
+      id: body.id,
+      artifactPlan: body.artifactPlan,
+      assistant: body.assistant,
+    })
+    return
+  } catch (reconnectError) {
+    console.warn('@vapi-ai/web reconnect failed, opening call URL:', reconnectError)
+    window.open(webCallUrl, '_blank', 'noopener,noreferrer')
+  }
 }
 
 export function stopDealScoutCall(): void {
