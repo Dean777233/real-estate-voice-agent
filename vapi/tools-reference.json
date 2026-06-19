@@ -1,0 +1,141 @@
+{
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "get_deal",
+        "description": "Fetch full details for a property listing by ID. Use when the investor asks about the property they were notified about.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "listing_id": {
+              "type": "string",
+              "description": "UUID of the listing to look up"
+            }
+          },
+          "required": ["listing_id"]
+        }
+      },
+      "server": {
+        "url": "https://zmyph3p8.us-east.insforge.app/functions/get-deal"
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "area_report",
+        "description": "Get neighborhood area stats: crime index, school rating, rent growth, and market notes. Use when the investor asks about the area, neighborhood, schools, or crime.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "listing_id": {
+              "type": "string",
+              "description": "UUID of the listing (preferred — resolves city/state/zip automatically)"
+            },
+            "city": {
+              "type": "string",
+              "description": "City name (use with state if no listing_id)"
+            },
+            "state": {
+              "type": "string",
+              "description": "Two-letter state code (use with city if no listing_id)"
+            }
+          }
+        }
+      },
+      "server": {
+        "url": "https://zmyph3p8.us-east.insforge.app/functions/area-report"
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "run_numbers",
+        "description": "Run investment numbers on a listing: gross rent, expenses, NOI, cap rate, and cash-on-cash. Use when the investor asks about returns, cap rate, cash flow, or deal math.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "listing_id": {
+              "type": "string",
+              "description": "UUID of the listing to analyze"
+            }
+          },
+          "required": ["listing_id"]
+        }
+      },
+      "server": {
+        "url": "https://zmyph3p8.us-east.insforge.app/functions/run-numbers"
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "save_deal",
+        "description": "Save a listing to the investor's watchlist with optional notes and rating. Use when the investor wants to bookmark, save, or rate a deal.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "listing_id": {
+              "type": "string",
+              "description": "UUID of the listing to save"
+            },
+            "notes": {
+              "type": "string",
+              "description": "Optional investor notes about the deal"
+            },
+            "rating": {
+              "type": "integer",
+              "description": "Optional 1-5 star rating",
+              "minimum": 1,
+              "maximum": 5
+            }
+          },
+          "required": ["listing_id"]
+        }
+      },
+      "server": {
+        "url": "https://zmyph3p8.us-east.insforge.app/functions/save-deal"
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "analyze_listing_photo",
+        "description": "Analyze the listing photo with AI vision for visible condition, curb appeal, and rehab red flags. Use when the investor asks about property condition, photos, or what the house looks like.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "listing_id": {
+              "type": "string",
+              "description": "UUID of the listing whose photo to analyze"
+            }
+          },
+          "required": ["listing_id"]
+        }
+      },
+      "server": {
+        "url": "https://zmyph3p8.us-east.insforge.app/functions/analyze-listing-photo"
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "search_similar",
+        "description": "Find up to 3 similar active listings in the same city and state, within 20% of list price and one bedroom. Use when the investor asks for comps or similar deals.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "listing_id": {
+              "type": "string",
+              "description": "UUID of the source listing to match against"
+            }
+          },
+          "required": ["listing_id"]
+        }
+      },
+      "server": {
+        "url": "https://zmyph3p8.us-east.insforge.app/functions/search-similar"
+      }
+    }
+  ]
+}

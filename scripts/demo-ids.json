@@ -1,0 +1,34 @@
+{
+  "listings": {
+    "DEMO-001": {
+      "id": "76c2dbd6-71fe-4e33-837e-a77fdf27c292",
+      "address": "742 Evergreen Terrace",
+      "city": "Austin",
+      "state": "TX"
+    },
+    "DEMO-002": {
+      "id": "88c23ac3-67e3-455f-9970-62115e03e778",
+      "address": "221B Baker Street",
+      "city": "Phoenix",
+      "state": "AZ"
+    },
+    "DEMO-003": {
+      "id": "bb9f6767-95a4-41d4-b263-fc0830ea7fa6",
+      "address": "88 Investment Lane",
+      "city": "Cleveland",
+      "state": "OH"
+    },
+    "DEMO-004": {
+      "id": "b0a76c6e-506d-44bb-9d94-061eba40fbe8",
+      "address": "512 Oak Hollow Dr",
+      "city": "Austin",
+      "state": "TX"
+    },
+    "DEMO-005": {
+      "id": "eefdd2dc-13c5-4f09-b95f-88e7e5902273",
+      "address": "1890 South Lamar Ct",
+      "city": "Austin",
+      "state": "TX"
+    }
+  }
+}
