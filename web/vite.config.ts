@@ -25,6 +25,9 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     envDir: __dirname,
+    optimizeDeps: {
+      include: ['@vapi-ai/web', '@daily-co/daily-js'],
+    },
     define: Object.fromEntries(
       Object.entries(mappedFromParent).map(([key, value]) => [
         `import.meta.env.${key}`,
