@@ -31,9 +31,9 @@ describe("run-numbers math", () => {
     const summary = formatNumbersSummary(input, calc);
 
     expect(summary).toContain("742 Evergreen Terrace");
-    expect(summary).toContain("$26,400");
-    expect(summary).toContain("$10,240");
-    expect(summary).toContain("$16,160");
+    expect(summary).toContain("twenty-six thousand four hundred dollars per year");
+    expect(summary).toContain("ten thousand two hundred forty dollars");
+    expect(summary).toContain("sixteen thousand one hundred sixty dollars");
     expect(summary).toMatch(/Cap rate 5\.7 percent/);
   });
 

@@ -14,7 +14,7 @@ fi
 : "${VAPI_API_KEY:?Set VAPI_API_KEY in .env.local or the environment}"
 
 PROMPT="$(cat "$ROOT/scripts/dealscout-assistant-prompt.txt")"
-FIRST_MESSAGE="Hey, I'm DealScout. I'm here about {{listing_address}} at {{list_price}}. What would you like to know about this listing — the numbers, the neighborhood, or something else?"
+FIRST_MESSAGE="Hey, I'm DealScout. I'm here about {{listing_address}} at {{list_price_spoken}}. What would you like to know about this listing — the numbers, the neighborhood, or something else?"
 
 CURRENT="$(curl -sS "https://api.vapi.ai/assistant/${ASSISTANT_ID}" \
   -H "Authorization: Bearer ${VAPI_API_KEY}")"

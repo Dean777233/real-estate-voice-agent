@@ -1,3 +1,8 @@
+import {
+  formatDollarsForSpeech,
+  formatDollarsPerYearForSpeech,
+} from "./speech-money.js";
+
 export type ListingNumbersInput = {
   address: string;
   city: string;
@@ -44,9 +49,9 @@ export function formatNumbersSummary(
 ): string {
   return (
     `Numbers for ${data.address}, ${data.city} ${data.state}. ` +
-    `Gross rent about $${fmt(calc.grossRentAnnual)} per year. ` +
-    `Expenses roughly $${fmt(calc.expenses)} including taxes, insurance, and 10% for management and repairs. ` +
-    `Net operating income about $${fmt(calc.noi)}. ` +
+    `Gross rent about ${formatDollarsPerYearForSpeech(calc.grossRentAnnual)}. ` +
+    `Expenses roughly ${formatDollarsForSpeech(calc.expenses)} including taxes, insurance, and 10% for management and repairs. ` +
+    `Net operating income about ${formatDollarsForSpeech(calc.noi)}. ` +
     `Cap rate ${calc.capRate.toFixed(1)} percent. ` +
     `Rough cash-on-cash around ${calc.cashOnCash.toFixed(1)} percent assuming all-cash purchase.`
   );

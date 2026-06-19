@@ -1,4 +1,5 @@
 import VapiImport from '@vapi-ai/web'
+import { formatDollarsForSpeech } from './speech-money'
 import type { Listing } from './types'
 
 type VapiClient = InstanceType<
@@ -61,6 +62,7 @@ function formatPrice(price: number): string {
 export function buildDealScoutCallContext(listing: Listing) {
   const listingAddress = `${listing.address}, ${listing.city} ${listing.state}`
   const listPrice = formatPrice(listing.list_price)
+  const listPriceSpoken = formatDollarsForSpeech(listing.list_price)
   return {
     metadata: { listing_id: listing.id },
     assistantOverrides: {
@@ -68,8 +70,9 @@ export function buildDealScoutCallContext(listing: Listing) {
         listing_id: listing.id,
         listing_address: listingAddress,
         list_price: listPrice,
+        list_price_spoken: listPriceSpoken,
       },
-      firstMessage: `Hey, I'm DealScout. I'm here about ${listingAddress} at ${listPrice}. What would you like to know about this listing — the numbers, the neighborhood, or something else?`,
+      firstMessage: `Hey, I'm DealScout. I'm here about ${listingAddress} at ${listPriceSpoken}. What would you like to know about this listing — the numbers, the neighborhood, or something else?`,
     },
   }
 }
