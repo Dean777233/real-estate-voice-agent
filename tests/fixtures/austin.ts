@@ -24,6 +24,8 @@ export const austinAreaStats = {
   state: "TX",
   zip: "78745",
   crime_index: 42,
+  violent_crime_rate: 3.2,
+  property_crime_rate: 18.5,
   school_rating: 7.8,
   rent_growth_yoy: 0.04,
   notes: "Strong job growth, moderate crime in south Austin.",

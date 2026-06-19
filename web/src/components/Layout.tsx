@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { Logo } from './Logo'
 
 export function Layout() {
   const { user, signOut } = useAuth()
@@ -8,7 +9,7 @@ export function Layout() {
     <div className="app-shell">
       <header className="app-header">
         <div className="brand">
-          <span className="brand-mark">DS</span>
+          <Logo className="brand-logo" size={40} />
           <div>
             <strong>DealScout</strong>
             <p>Real estate voice agent</p>

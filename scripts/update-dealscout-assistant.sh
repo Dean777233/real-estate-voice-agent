@@ -24,7 +24,7 @@ BODY="$(jq -nc \
   --arg content "$PROMPT" \
   --arg firstMessage "$FIRST_MESSAGE" \
   --arg getDealDesc 'Fetch verified property details from the database. Always use listing_id {{listing_id}} from call context unless the user explicitly specifies another property.' \
-  --arg areaDesc 'Get aggregated neighborhood stats: crime index, school rating, rent growth, and market notes. Always use listing_id {{listing_id}} from call context unless the user explicitly specifies another property.' \
+  --arg areaDesc 'Get aggregated neighborhood stats: crime index, violent and property crime rates, school rating, rent growth, and market notes. Call whenever the investor asks about crime, safety, neighborhood quality, schools, or the area. Always use listing_id {{listing_id}} from call context unless the user explicitly specifies another property.' \
   --arg numbersDesc 'Run investment numbers: gross rent, expenses, NOI, cap rate, and cash-on-cash. Always use listing_id {{listing_id}} from call context unless the user explicitly specifies another property.' \
   --arg saveDesc 'Save a listing to the investor watchlist with optional notes and rating. Use listing_id {{listing_id}} for the property on this call unless the user names another.' \
   --arg photoDesc 'Analyze the listing photo with AI vision for condition and rehab red flags. Always use listing_id {{listing_id}} from call context unless the user specifies another property.' \

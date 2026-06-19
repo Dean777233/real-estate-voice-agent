@@ -24,7 +24,7 @@
       "type": "function",
       "function": {
         "name": "area_report",
-        "description": "Get neighborhood area stats: crime index, school rating, rent growth, and market notes. Use when the investor asks about the area, neighborhood, schools, or crime.",
+        "description": "Get neighborhood area stats: crime index, violent and property crime rates, school rating, rent growth, and market notes. Call whenever the investor asks about crime, safety, neighborhood quality, schools, or the area. Always pass listing_id from call context.",
         "parameters": {
           "type": "object",
           "properties": {

@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { formatAreaReport, pct } from "../../lib/area-report.js";
+import {
+  formatAreaReport,
+  formatNoAreaStatsMessage,
+  pct,
+} from "../../lib/area-report.js";
 import { austinAreaStats } from "../fixtures/austin.js";
 
 describe("area-report formatting", () => {
@@ -17,9 +21,29 @@ describe("area-report formatting", () => {
 
     expect(summary).toContain("Area report for Austin, TX 78745");
     expect(summary).toContain("Crime index 42 out of 100");
+    expect(summary).toContain("Violent crime rate 3.2 per thousand residents");
+    expect(summary).toContain("Property crime rate 18.5 per thousand residents");
     expect(summary).toContain("School rating 7.8 out of 10");
     expect(summary).toContain("Rent growth year over year 4.0%");
     expect(summary).toContain("Strong job growth");
+  });
+
+  it("notes when stats zip differs from requested zip", () => {
+    const summary = formatAreaReport(
+      "Austin",
+      "TX",
+      austinAreaStats,
+      { requestedZip: "78704" },
+    );
+
+    expect(summary).toContain("Stats are for zip 78745 in the same market");
+  });
+
+  it("formats helpful message when no stats exist", () => {
+    const message = formatNoAreaStatsMessage("Dallas", "TX");
+    expect(message).toContain("Dallas, TX");
+    expect(message.toLowerCase()).toContain("crime");
+    expect(message).not.toContain("error");
   });
 
   it("omits zip segment when not provided", () => {

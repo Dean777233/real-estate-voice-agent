@@ -26,15 +26,14 @@
   color: #94a3b8;
 }
 
-.brand-mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.brand-logo {
+  flex-shrink: 0;
+  display: block;
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 0.75rem;
-  background: linear-gradient(135deg, #14b8a6, #0d9488);
-  font-weight: 700;
+  background: linear-gradient(135deg, #ecfdf5, #f0fdfa);
+  box-shadow: 0 1px 3px rgb(15 23 42 / 12%);
 }
 
 .app-nav {
