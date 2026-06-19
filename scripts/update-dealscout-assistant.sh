@@ -14,7 +14,7 @@ fi
 : "${VAPI_API_KEY:?Set VAPI_API_KEY in .env.local or the environment}"
 
 PROMPT="$(cat "$ROOT/scripts/dealscout-assistant-prompt.txt")"
-FIRST_MESSAGE='Hi, this is DealScout. I am ready to walk through {{listing_address}} at {{list_price}}. Let me pull up the listing details now.'
+FIRST_MESSAGE="Hey, I'm DealScout. I'm here about {{listing_address}} at {{list_price}}. What would you like to know about this listing — the numbers, the neighborhood, or something else?"
 
 CURRENT="$(curl -sS "https://api.vapi.ai/assistant/${ASSISTANT_ID}" \
   -H "Authorization: Bearer ${VAPI_API_KEY}")"
@@ -29,18 +29,27 @@ BODY="$(jq -nc \
   --arg saveDesc 'Save a listing to the investor watchlist with optional notes and rating. Use listing_id {{listing_id}} for the property on this call unless the user names another.' \
   --arg photoDesc 'Analyze the listing photo with AI vision for condition and rehab red flags. Always use listing_id {{listing_id}} from call context unless the user specifies another property.' \
   --arg similarDesc 'Find up to 3 similar listings in the same market. Always use listing_id {{listing_id}} from call context unless the user specifies another property.' \
+  --argjson silentToolMessages '[{"type":"request-start","content":"","blocking":false},{"type":"request-complete","content":""},{"type":"request-failed","content":"Sorry, I could not get that data."}]' \
   '{
     firstMessage: $firstMessage,
     model: ($current.model
       | .messages = [{ role: "system", content: $content }]
       | .tools = (.tools | map(
-          if .function.name == "get_deal" then .function.description = $getDealDesc
-          elif .function.name == "area_report" then .function.description = $areaDesc
-          elif .function.name == "run_numbers" then .function.description = $numbersDesc
-          elif .function.name == "save_deal" then .function.description = $saveDesc
-          elif .function.name == "analyze_listing_photo" then .function.description = $photoDesc
-          elif .function.name == "search_similar" then .function.description = $similarDesc
-          else . end
+          if .function.name == "get_deal" then
+              .function.description = $getDealDesc
+              | .async = true
+              | .messages = $silentToolMessages
+            elif .function.name == "area_report" then
+              .function.description = $areaDesc | .messages = $silentToolMessages
+            elif .function.name == "run_numbers" then
+              .function.description = $numbersDesc | .messages = $silentToolMessages
+            elif .function.name == "save_deal" then
+              .function.description = $saveDesc | .messages = $silentToolMessages
+            elif .function.name == "analyze_listing_photo" then
+              .function.description = $photoDesc | .messages = $silentToolMessages
+            elif .function.name == "search_similar" then
+              .function.description = $similarDesc | .messages = $silentToolMessages
+            else . end
         ))
     )
   }')"

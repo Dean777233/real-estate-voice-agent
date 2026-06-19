@@ -37,7 +37,7 @@ BODY="$(jq -nc \
         listing_address: $listingAddress,
         list_price: $listPrice
       },
-      firstMessage: ("Hi, this is DealScout. I am ready to walk through " + $listingAddress + " at " + $listPrice + ". Let me pull up the listing details now.")
+      firstMessage: ("Hey, I'm DealScout. I'm here about " + $listingAddress + " at " + $listPrice + ". What would you like to know about this listing — the numbers, the neighborhood, or something else?")
     }
   }')"
 
