@@ -58,6 +58,19 @@ function formatPrice(price: number): string {
   }).format(price)
 }
 
+
+const DEALSCOUT_BACKGROUND_SPEECH_DENOISING_PLAN = {
+  smartDenoisingPlan: { enabled: true },
+  fourierDenoisingPlan: {
+    enabled: true,
+    staticThreshold: -35,
+    baselineOffsetDb: -15,
+    windowSizeMs: 3000,
+    baselinePercentile: 85,
+    mediaDetectionEnabled: true,
+  },
+} as const
+
 /** Listing context passed to Vapi as call metadata + assistant template variables. */
 export function buildDealScoutCallContext(listing: Listing) {
   const listingAddress = `${listing.address}, ${listing.city} ${listing.state}`
@@ -73,6 +86,7 @@ export function buildDealScoutCallContext(listing: Listing) {
         list_price_spoken: listPriceSpoken,
       },
       firstMessage: `Hey, I'm DealScout. I'm here about ${listingAddress} at ${listPriceSpoken}. What would you like to know about this listing — the numbers, the neighborhood, or something else?`,
+      backgroundSpeechDenoisingPlan: DEALSCOUT_BACKGROUND_SPEECH_DENOISING_PLAN,
     },
   }
 }

@@ -51,7 +51,18 @@ BODY="$(jq -nc \
               .function.description = $similarDesc | .messages = $silentToolMessages
             else . end
         ))
-    )
+    ),
+    backgroundSpeechDenoisingPlan: {
+      smartDenoisingPlan: { enabled: true },
+      fourierDenoisingPlan: {
+        enabled: true,
+        staticThreshold: -35,
+        baselineOffsetDb: -15,
+        windowSizeMs: 3000,
+        baselinePercentile: 85,
+        mediaDetectionEnabled: true
+      }
+    }
   }')"
 
 echo "PATCH https://api.vapi.ai/assistant/${ASSISTANT_ID}" >&2
